@@ -58,6 +58,13 @@ class EmpresaTests {
 
         listEmp.forEach(System.out::println);
 
+        var result = listEmp.stream()
+                .filter(e -> e.getDepartamento() != null)
+                .map(e -> e.getDepartamento().getCodigo())
+                .distinct()
+                .toList();
+
+        System.out.println(result);
 
     }
 
@@ -70,12 +77,16 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
         listEmp.forEach(System.out::println);
 
+        record nombreCompleto(String nom, String ap1, String ap2) {
+        }
+        var result = listEmp.stream()
+                .map(e -> new nombreCompleto((e.getNombre()), e.getApellido1(), e.getApellido2()))
+                .toList();
 
+        System.out.println(result);
     }
-
     /**
      * 3. Lista el código de los empleados junto al nif, pero el nif deberá aparecer en dos columnas, 
      * una mostrará únicamente los dígitos del nif y la otra la letra.
@@ -89,38 +100,71 @@ class EmpresaTests {
 
         listEmp.forEach(System.out::println);
 
+        record codigoYNif(int cod, int numNif, String letraNif){}
 
+        var result = listEmp.stream()
+                .map(e -> new codigoYNif(e.getCodigo(), recibirnum(e.getNif()), recibirletra(e.getNif())))
+                .toList();
+
+        System.out.println(result);
+    }
+
+    public static int recibirnum(String nif){
+        nif = nif.substring(0, 8);
+        return Integer.parseInt(nif);
+    }
+    public static String recibirletra(String nif){
+        return nif.substring(9);
     }
 
     /**
      * 4. Lista el nombre de cada departamento y el valor del presupuesto actual del que dispone. 
-     * Para calcular este dato tendrá que restar al valor del presupuesto inicial (columna presupuesto) los gastos que se han generado (columna gastos).
+     * Para calcular este dato tendrá que restar al valor del presupuesto inicial (columna presupuesto)
+     * los gastos que se han generado (columna gastos).
      *  Tenga en cuenta que en algunos casos pueden existir valores negativos.
      */
+    @Test
     void test4() {
 
         var listDep = depRepo.findAll();
 
-
         listDep.forEach(System.out::println);
 
-     }
+        record nombreYPre(String n, double p){}
 
+        var result = listDep.stream()
+                .map(e -> new nombreYPre(e.getNombre(), presupuesto(e.getPresupuesto(), e.getGastos())))
+                .toList();
+
+        System.out.println(result);
+    }
+
+     public static double presupuesto(double inicial, double gastos){return inicial - gastos;}
     /**
      * 5. Lista el nombre de los departamentos y el valor del presupuesto actual ordenado de forma ascendente.
      */
+    @Test
     void test5() {
 
         var listDep = depRepo.findAll();
 
-
         listDep.forEach(System.out::println);
 
-     }
+        record nombreYPre(String n, double p){}
+
+        var result = listDep.stream()
+                .map(e -> new nombreYPre(e.getNombre(), presupuesto(e.getPresupuesto(), e.getGastos())))
+                .sorted(Comparator.comparingDouble(nombreYPre::p))
+                .toList();
+
+        System.out.println(result);
+
+    }
 
     /**
      * 6. Devuelve una lista con el nombre y el presupuesto, de los 3 departamentos que tienen mayor presupuesto
      */
+    @Test
     void test6() {
 
         var listDep = depRepo.findAll();
@@ -128,11 +172,21 @@ class EmpresaTests {
 
         listDep.forEach(System.out::println);
 
+        record nombreYPre(String n, double p){}
+
+        var result = listDep.stream()
+                .map(e -> new nombreYPre(e.getNombre(), presupuesto(e.getPresupuesto(), e.getGastos())))
+                .sorted(Comparator.comparingDouble(nombreYPre::p).reversed())
+                .toList();
+
+        System.out.println(result);
+
      }
 
     /**
      * 7. Devuelve una lista con el nombre de los departamentos y el presupesto, de aquellos que tienen un presupuesto entre 100000 y 200000 euros
      */
+    @Test
     void test7() {
 
         var listDep = depRepo.findAll();
@@ -140,6 +194,14 @@ class EmpresaTests {
 
         listDep.forEach(System.out::println);
 
+        record nombreYPre(String n, double p){}
+
+        var result = listDep.stream()
+                .map(e -> new nombreYPre(e.getNombre(), presupuesto(e.getPresupuesto(), e.getGastos())))
+                .filter(nyp -> nyp.p() >= 100000 && nyp.p() <= 200000)
+                .toList();
+
+        System.out.println(result);
      }
 
     /**
