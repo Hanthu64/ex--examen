@@ -212,16 +212,22 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
         listEmp.forEach(System.out::println);
 
+        var result = listEmp.stream()
+                .sorted(Comparator.comparing(Empleado::getCodigo))
+                .skip(2)
+                .limit(5)
+                .toList();
 
+        System.out.println(result);
     }
 
     /**
      * 9. Devuelve una lista con el nombre de los departamentos y el gasto, de aquellos que tienen menos de 5000 euros de gastos.
      * Ordenada de mayor a menor gasto.
      */
+    @Test
     void test9() {
 
         var listDep = depRepo.findAll();
@@ -229,6 +235,15 @@ class EmpresaTests {
 
         listDep.forEach(System.out::println);
 
+        record nombreYGasto(String r, double g){}
+
+        var result = listDep.stream()
+                .map(e -> new nombreYGasto(e.getNombre(), e.getGastos()))
+                .filter(nyg -> nyg.g() < 5000)
+                .sorted(Comparator.comparingDouble(nombreYGasto::g).reversed())
+                .toList();
+
+        System.out.println(result);
      }
 
     /**
@@ -239,10 +254,13 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
-
         listEmp.forEach(System.out::println);
 
+        var result = listEmp.stream()
+                        .filter(e -> "Díaz".equals(e.getApellido2())|| "Moreno".equals(e.getApellido2()))
+                        .toList();
+
+        System.out.println(result);
 
     }
 
@@ -254,11 +272,16 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
-
         listEmp.forEach(System.out::println);
 
+        record nomApsNif(String nom, String ap1, String ap2, String nif) {
+        }
+        var result = listEmp.stream()
+                .filter(e -> List.of("2", "4", "5").contains(e.getDepartamento().getId()))
+                .map(e -> new nomApsNif(e.getNombre(), e.getApellido1(), e.getApellido2(), e.getNif()))
+                .toList();
 
+        System.out.println(result);
     }
 
 
